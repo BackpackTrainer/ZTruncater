@@ -4,9 +4,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EmptySource;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -109,7 +107,6 @@ public class ZTruncaterTests {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
                 () -> truncater.truncateZInFirstTwoPositions(emptyString));
         assertEquals("Token cannot be an empty String", e.getMessage());
-
     }
 
     @ParameterizedTest
@@ -117,6 +114,22 @@ public class ZTruncaterTests {
     public void testThrowingExceptions(String badString) {
         assertThrows(Exception.class,
                 () -> truncater.truncateZInFirstTwoPositions(badString));
+    }
+
+    @ParameterizedTest
+    @CsvSource ({"Z, ''", "ZABC, ABC", "ZZBCDEF, BCDEF", "AZBCD, ABCD", "ABCDEFGHI, ABCDEFGHI", "ABZCDEFGHI, ABZCDEFGHI"})
+    public void testWithCsvSource(String testString, String expectedOutput) {
+        actualOutput = truncater.truncateZInFirstTwoPositions(testString);
+
+        assertEquals(expectedOutput, actualOutput);
+    }
+
+    @ParameterizedTest
+    @CsvFileSource(resources = "/ZTruncaterTestCases", numLinesToSkip = 1)
+    public void testWithCsvFileSource(String testString, String expectedOutput) {
+        actualOutput = truncater.truncateZInFirstTwoPositions(testString);
+
+        assertEquals(expectedOutput, actualOutput);
     }
 }
 
